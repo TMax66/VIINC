@@ -1,0 +1,13 @@
+name: VIINC
+title: VIINC
+username:
+account: izslerapp
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2524777
+bundleId: 3338151
+url: https://izslerapp.shinyapps.io/VIINC/
+when: 1593595352.69733
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .gitattributes|code.r|fcode.R|nc2.csv

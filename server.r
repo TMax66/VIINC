@@ -90,7 +90,7 @@ server <- function(input, output) {
                                 mainPanel("",
                                       fluidRow( 
                                         column(12, 
-                                          DT::dataTableOutput("dt")
+                                          DT::dataTableOutput("dt", width="1200px")
                                         )
                                       )
                                 )
@@ -187,8 +187,8 @@ dx2<-reactive({df %>%
   output$dt<- DT::renderDataTable(
     dfx(),  server= FALSE,filter = 'top', extensions = 'Buttons',class = 'cell-border stripe', 
     rownames = FALSE, options = list(
-      dom = 'Bfrtip',paging = TRUE, autoWidth = FALSE,
-      pageLength = 10,buttons = c("csv",'excel'))
+      dom = 'Bfrtip',paging = TRUE, autoWidth = TRUE,
+      pageLength = 20,buttons = c("csv",'excel'))
     )
   
 
