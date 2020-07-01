@@ -1,4 +1,4 @@
-credentials <- list("test" = "123")
+credentials <- list("VIINC" = "2019", "test"="123")
 server <- function(input, output) {
 
   USER <- reactiveValues(Logged = FALSE)
@@ -26,26 +26,23 @@ server <- function(input, output) {
     } else {
       
       ui <- navbarPage("Rilievi Visite Ispettive Interne",
+                       theme = shinytheme("cerulean"),        
                        
                        
                        
-                       tabPanel("Database rilievi",
-                                useShinyalert(),
-                                mainPanel("",
-                                          
-                                          DT::dataTableOutput("dt")
-                                          
-                                )
-                       ),
                        tabPanel("Risultati totale IZSLER",
                                 
                                 sidebarPanel(
                                   sliderInput("anno2",
                                               label = "anno",
-                                              min = 2012, max = 2018, value = c(2018)),
+                                              min = 2012, max = 2019, value = c(2019)),
                                   selectInput("rilievo2", label = "tipo di rilievo",
                                               choices = c("NC", "COMM"),
-                                              selected="NC")
+                                              selected="NC"), 
+                                  br(),
+                                  hr(),
+                                  tags$b("n. rilievi per anno"),
+                                  plotOutput("trend")
                                 ),
                                 
                                 mainPanel(
@@ -70,13 +67,16 @@ server <- function(input, output) {
                                   
                                   sliderInput("anno",
                                               label = "anno",
-                                              min = 2012, max = 2018, value = c(2018)),
+                                              min = 2012, max = 2019, value = c(2019)),
                                   
                                   selectInput("rilievo", label = "tipo di rilievo",
                                               choices = c("NC", "COMM"),
                                               selected="NC"),
                                   hr(),
-                                  plotOutput("plot", height="400px")
+                                  plotOutput("plot", height="400px"),
+                                  hr(),
+                                  tags$b("numero di rilievi per anno"),
+                                  plotOutput("trends")
                                 ),
                                 
                                 mainPanel("",
@@ -84,6 +84,16 @@ server <- function(input, output) {
 
                                 )
                                 
+                       ),
+                       tabPanel("Database rilievi",
+                                useShinyalert(),
+                                mainPanel("",
+                                      fluidRow( 
+                                        column(12, 
+                                          DT::dataTableOutput("dt")
+                                        )
+                                      )
+                                )
                        )
                        
                        
@@ -121,7 +131,7 @@ output$plot1<- renderPlot({
 dx2<-reactive({df %>% 
     group_by(anno,strutture, p.norma,tiporilievo, rilievo) %>% 
     filter(anno==input$anno,strutture==input$struttura, tiporilievo==input$rilievo) %>% 
-    select(anno, "punto della norma"=p.norma, "tipo rilievo"=tiporilievo, rilievo, -strutture )
+    select(anno, "punto della norma"=p.norma, "tipo rilievo"=tiporilievo, rilievo, -strutture, reiterata)
 })
 
 
@@ -158,7 +168,7 @@ dx2<-reactive({df %>%
                        yend=n.rilievi-0.1
       ))+
       labs(title="n rilievi",caption=Sys.Date()) +  
-      coord_flip()
+      coord_flip()+ theme_clean()
     }
   })
 
@@ -177,9 +187,23 @@ dx2<-reactive({df %>%
   output$dt<- DT::renderDataTable(
     dfx(),  server= FALSE,filter = 'top', extensions = 'Buttons',class = 'cell-border stripe', 
     rownames = FALSE, options = list(
-      dom = 'Bfrtip',paging = TRUE, autoWidth = TRUE,
+      dom = 'Bfrtip',paging = TRUE, autoWidth = FALSE,
       pageLength = 10,buttons = c("csv",'excel'))
     )
+  
+
+  output$trends<-renderPlot({df2 %>% 
+    group_by(anno) %>% 
+    filter(strutture==input$struttura) %>% 
+    summarise('n.rilievi'=n()) %>% 
+    ggplot(aes(x=anno, y=n.rilievi, group=1))+geom_line()+ geom_point(color="navy", size=2)+
+    theme_clean()})
+  
+  output$trend<-renderPlot({df2 %>% 
+      group_by(anno) %>% 
+      summarise('n.rilievi'=n()) %>% 
+      ggplot(aes(x=anno, y=n.rilievi, group=1))+geom_line()+ geom_point(color="navy", size=2)+
+      theme_clean()})
   
   
   
