@@ -1,4 +1,6 @@
-credentials <- list("VIINC" = "2019", "test"="123")
+
+
+credentials <- list("VIINC" = "123")
 server <- function(input, output) {
 
   USER <- reactiveValues(Logged = FALSE)
@@ -153,11 +155,10 @@ dx2<-reactive({df %>%
   
   output$plot<- renderPlot({
 
-    if(dim(dx()[1])==0) 
-    {shinyalert("Oops!", "Non ci sono dati per gli input inseriti.", type = "error")} 
-    else{
+    # ifelse(dim(dx()[1])== 0, 
+    #   shinyalert("Oops!", "Non ci sono dati per gli input inseriti.", type = "error"), 
       dx() %>% 
-      as.data.frame()%>%
+      #as.data.frame()%>%
       mutate(p.norma = factor(p.norma, unique(p.norma))) %>% 
       ggplot(aes(x=p.norma,y=n.rilievi,label=n.rilievi))+
       geom_point(stat='identity',col="lightblue", size=8)+
@@ -169,7 +170,7 @@ dx2<-reactive({df %>%
       ))+
       labs(title="n rilievi",caption=Sys.Date()) +  
       coord_flip()+ theme_clean()
-    }
+    
   })
 
   # df2<-reactive({ 
